@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motta — แบบประเมินความพึงพอใจ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pink:#EF7090;--pink-deep:#D45570;--pink-light:#FDF0F3;
+  --pink-pale:#FFF7F9;--pink-mid:#F5A8BB;--white:#FFFFFF;
+  --text:#2A1A1F;--muted:#A07080;--border:#F2D8DF;--bg:#FFF4F6;
+  --r:20px;--r-sm:12px;
+}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
+
+/* HERO */
+.hero{background:var(--white);padding:40px 24px 36px;text-align:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,#FFDDE6 0%,transparent 70%);top:-120px;left:50%;transform:translateX(-50%);pointer-events:none}
+.logo-wrap{display:inline-block;margin-bottom:20px;position:relative;z-index:1}
+.logo-wrap svg{width:120px;height:auto}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,3.5vw,15px);letter-spacing:.25em;color:var(--pink);text-transform:uppercase;font-weight:400;margin-bottom:6px}
+.hero-sub{font-size:14px;color:var(--muted);font-weight:300;letter-spacing:.03em}
+
+/* PROGRESS */
+.prog-wrap{height:2px;background:var(--border)}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--pink-mid),var(--pink));transition:width .5s cubic-bezier(.4,0,.2,1);width:0%}
+
+/* WRAP & CARD */
+.wrap{max-width:520px;margin:0 auto;padding:28px 16px 0}
+.card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:28px 24px;margin-bottom:14px;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card:nth-child(1){animation-delay:.05s}.card:nth-child(2){animation-delay:.12s}.card:nth-child(3){animation-delay:.19s}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.card-dot{width:8px;height:8px;border-radius:50%;background:var(--pink);flex-shrink:0}
+.card-title{font-size:15px;font-weight:600;color:var(--text);letter-spacing:.01em}
+
+/* FIELDS */
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.field input,.field select,.field textarea{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:15px;color:var(--text);background:var(--pink-pale);outline:none;transition:border-color .2s,background .2s;appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink);background:var(--white)}
+.field input::placeholder,.field textarea::placeholder{color:#C9A0AE;font-size:14px}
+.sel-wrap{position:relative}
+.sel-wrap::after{content:'';position:absolute;right:16px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-top:6px solid var(--pink);pointer-events:none}
+.field-note{font-size:11px;color:var(--muted);margin-top:5px;padding-left:2px}
+
+/* STARS */
+.star-question{margin-bottom:24px}
+.star-question:last-child{margin-bottom:0}
+.q-label{font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px;line-height:1.5}
+.q-sub{font-size:12px;color:var(--muted);margin-bottom:12px}
+.stars{display:flex;gap:6px}
+.star-btn{background:none;border:none;cursor:pointer;padding:2px;transition:transform .15s;line-height:1}
+.star-btn:hover{transform:scale(1.15)}
+.star-btn:active{transform:scale(.9)}
+.star-btn svg{width:42px;height:42px;display:block;fill:#F0D0D8;stroke:#E8AABB;stroke-width:1;transition:fill .15s,stroke .15s}
+.star-btn.lit svg{fill:var(--pink);stroke:var(--pink-deep)}
+.star-label{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px;transition:color .2s;font-style:italic}
+.star-label.on{color:var(--pink);font-weight:500}
+
+/* TEXTAREA */
+.field textarea{min-height:96px;resize:vertical;line-height:1.7}
+
+/* SUBMIT */
+.btn-submit{width:100%;padding:18px;background:var(--pink);color:#fff;border:none;border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:17px;font-weight:600;cursor:pointer;letter-spacing:.04em;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 6px 24px rgba(239,112,144,.35);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
+.btn-submit:hover:not(:disabled){background:var(--pink-deep);box-shadow:0 8px 28px rgba(239,112,144,.45)}
+.btn-submit:active:not(:disabled){transform:scale(.98)}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed}
+
+/* LOADING SPINNER */
+.spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ERROR BANNER */
+.error-banner{background:#FFF0F0;border:1px solid #F8BBBB;border-radius:var(--r-sm);padding:12px 16px;margin-top:12px;font-size:13px;color:#C0392B;display:none;line-height:1.5}
+
+/* REQ */
+.req{color:var(--pink);margin-left:2px}
+
+/* SUCCESS */
+#successCard{display:none}
+.success-inner{padding:48px 24px;text-align:center}
+.s-icon{width:72px;height:72px;border-radius:50%;background:var(--pink-light);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;border:2px solid var(--pink-mid)}
+.s-icon svg{width:32px;height:32px;stroke:var(--pink);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.s-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:var(--text);margin-bottom:8px}
+.s-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:28px}
+.score-box{background:var(--pink-light);border-radius:var(--r-sm);padding:20px;margin-bottom:24px;border:1px solid var(--border)}
+.score-num{font-size:52px;font-weight:700;color:var(--pink);line-height:1;font-family:'Cormorant Garamond',serif}
+.score-of{font-size:13px;color:var(--muted);margin-top:4px}
+.saved-badge{display:inline-flex;align-items:center;gap:6px;background:#EAF7EF;border:1px solid #A8DFBE;border-radius:50px;padding:5px 14px;font-size:12px;color:#27AE60;font-weight:600;margin-bottom:20px}
+.saved-badge svg{width:14px;height:14px;stroke:#27AE60;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-reset{padding:12px 36px;border:1.5px solid var(--pink);border-radius:var(--r-sm);color:var(--pink);background:none;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-reset:hover{background:var(--pink);color:#fff}
+
+@media(min-width:600px){
+  .hero{padding:56px 40px 44px}
+  .logo-wrap svg{width:140px}
+  .wrap{padding:36px 24px 0}
+  .card{padding:36px 32px}
+  .star-btn svg{width:46px;height:46px}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="logo-wrap">
+    <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <g stroke="#EF7090" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <path d="M 185 30 C 215 55, 215 110, 150 135"/>
+        <ellipse cx="108" cy="88" rx="68" ry="42" transform="rotate(-12 108 88)"/>
+        <path d="M 58 65 C 48 52, 35 58, 42 72"/>
+      </g>
+      <text x="26" y="168" font-family="'Cormorant Garamond',Georgia,serif" font-size="52" font-weight="500" fill="#EF7090" letter-spacing="3">Motta</text>
+    </svg>
+  </div>
+  <div class="hero-title">Employee Satisfaction Survey</div>
+  <div class="hero-sub">แบบประเมินความพึงพอใจพนักงานหน้าสาขา</div>
+</div>
+
+<div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+
+<div class="wrap">
+<form id="form">
+
+  <!-- ส่วนที่ 1 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-dot"></div>
+      <div class="card-title">ข้อมูลการรับบริการ</div>
+    </div>
+
+    <div class="field">
+      <label>สาขา <span class="req">*</span></label>
+      <div class="sel-wrap">
+        <select id="branch" required>
+          <option value="">— เลือกสาขา —</option>
+          <option>สาขาสยามสแควร์</option>
+          <option>สาขาเซ็นทรัลลาดพร้าว</option>
+          <option>สาขาเมกาบางนา</option>
+          <option>สาขารังสิต</option>
+          <option>สาขาพระราม 2</option>
+          <option>สาขาเชียงใหม่</option>
+          <option>อื่น ๆ</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>ชื่อพนักงาน</label>
+      <input type="text" id="staffName" placeholder="ระบุชื่อ หรือ รหัสพนักงาน">
+      <div class="field-note">* สามารถดึงข้อมูลอัตโนมัติจาก QR Code / URL parameter (?staff=ชื่อ)</div>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 2 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-dot"></div>
+      <div class="card-title">ให้คะแนนความพึงพอใจ</div>
+    </div>
+
+    <div class="star-question">
+      <div class="q-label">ความพึงพอใจโดยรวม <span class="req">*</span></div>
+      <div class="q-sub">ประสบการณ์การรับบริการในครั้งนี้</div>
+      <div class="stars" data-g="q1">
+        <button type="button" class="star-btn" data-v="1"></button>
+        <button type="button" class="star-btn" data-v="2"></button>
+        <button type="button" class="star-btn" data-v="3"></button>
+        <button type="button" class="star-btn" data-v="4"></button>
+        <button type="button" class="star-btn" data-v="5"></button>
+      </div>
+      <div class="star-label" id="lbl-q1"></div>
+    </div>
+
+    <div class="star-question">
+      <div class="q-label">ความสุภาพและมิตรไมตรี <span class="req">*</span></div>
+      <div class="q-sub">การทักทาย ยิ้มแย้ม และการต้อนรับ</div>
+      <div class="stars" data-g="q2">
+        <button type="button" class="star-btn" data-v="1"></button>
+        <button type="button" class="star-btn" data-v="2"></button>
+        <button type="button" class="star-btn" data-v="3"></button>
+        <button type="button" class="star-btn" data-v="4"></button>
+        <button type="button" class="star-btn" data-v="5"></button>
+      </div>
+      <div class="star-label" id="lbl-q2"></div>
+    </div>
+
+    <div class="star-question">
+      <div class="q-label">ความรวดเร็วในการให้บริการ <span class="req">*</span></div>
+      <div class="q-sub">ระยะเวลารอคอยและความคล่องตัว</div>
+      <div class="stars" data-g="q3">
+        <button type="button" class="star-btn" data-v="1"></button>
+        <button type="button" class="star-btn" data-v="2"></button>
+        <button type="button" class="star-btn" data-v="3"></button>
+        <button type="button" class="star-btn" data-v="4"></button>
+        <button type="button" class="star-btn" data-v="5"></button>
+      </div>
+      <div class="star-label" id="lbl-q3"></div>
+    </div>
+
+    <div class="star-question" style="margin-bottom:0">
+      <div class="q-label">ความรู้และการให้ข้อมูล</div>
+      <div class="q-sub">พนักงานให้ข้อมูลได้ถูกต้องและครบถ้วน</div>
+      <div class="stars" data-g="q4">
+        <button type="button" class="star-btn" data-v="1"></button>
+        <button type="button" class="star-btn" data-v="2"></button>
+        <button type="button" class="star-btn" data-v="3"></button>
+        <button type="button" class="star-btn" data-v="4"></button>
+        <button type="button" class="star-btn" data-v="5"></button>
+      </div>
+      <div class="star-label" id="lbl-q4"></div>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 3 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-dot"></div>
+      <div class="card-title">ข้อเสนอแนะเพิ่มเติม</div>
+    </div>
+
+    <div class="field" style="margin-bottom:16px">
+      <label>ความคิดเห็น / ข้อเสนอแนะ</label>
+      <textarea id="comment" placeholder="ฝากข้อความถึงพนักงานหรือแนะนำการปรับปรุงได้ที่นี่..."></textarea>
+    </div>
+
+    <button type="submit" class="btn-submit" id="submitBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      ส่งแบบประเมิน
+    </button>
+    <div class="error-banner" id="errBanner"></div>
+  </div>
+
+</form>
+
+<!-- SUCCESS -->
+<div class="card" id="successCard">
+  <div class="success-inner">
+    <div class="saved-badge">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      บันทึกลง Google Sheets แล้ว
+    </div>
+    <div class="s-icon">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="s-title">ขอบคุณค่ะ ✦</div>
+    <div class="s-sub">เราได้รับแบบประเมินของคุณแล้ว<br>และจะนำไปพัฒนาการบริการต่อไป</div>
+    <div class="score-box">
+      <div class="score-num" id="finalScore">—</div>
+      <div class="score-of" id="finalOf">คะแนนรวม</div>
+    </div>
+    <button class="btn-reset" onclick="resetForm()">ประเมินใหม่</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  ⚠️  วาง Web App URL จาก Google Apps Script ตรงนี้
+// ══════════════════════════════════════════════════
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/https://script.google.com/macros/s/AKfycbw0u8z5TiGDXB3MOwtvu-R_SFRY-Nitihh38p9GAE5Vbu26nK9hQhgqmR6EhuqfiXnJ/execexec";
+//                                                   ↑ แทนด้วย URL ที่ได้จาก Deploy
+
+// ── ดึงชื่อพนักงานจาก URL param อัตโนมัติ ──
+const urlParams = new URLSearchParams(window.location.search);
+const autoStaff = urlParams.get('staff') || urlParams.get('name') || '';
+if (autoStaff) {
+  document.getElementById('staffName').value = decodeURIComponent(autoStaff);
+  document.getElementById('staffName').readOnly = true;
+  document.getElementById('staffName').style.background = '#F5E8EC';
+}
+const autoBranch = urlParams.get('branch') || '';
+if (autoBranch) {
+  const sel = document.getElementById('branch');
+  [...sel.options].forEach(o => { if (o.text.includes(decodeURIComponent(autoBranch))) sel.value = o.value; });
+}
+
+// ── Star rating ──
+const labels = ['','แย่มาก 😞','ต้องปรับปรุง 😕','พอใช้ได้ 😐','ดีมาก 😊','ยอดเยี่ยม 🤩'];
+const scores = { q1:0, q2:0, q3:0, q4:0 };
+
+document.querySelectorAll('.star-btn').forEach(b => {
+  b.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+});
+
+document.querySelectorAll('.stars').forEach(row => {
+  const g = row.dataset.g;
+  const btns = row.querySelectorAll('.star-btn');
+  btns.forEach(b => {
+    b.addEventListener('click', () => {
+      const v = +b.dataset.v;
+      scores[g] = v;
+      btns.forEach(x => x.classList.toggle('lit', +x.dataset.v <= v));
+      const lbl = document.getElementById('lbl-' + g);
+      lbl.textContent = labels[v];
+      lbl.classList.add('on');
+      updateProg();
+    });
+  });
+});
+
+function updateProg() {
+  const req = [scores.q1 > 0, scores.q2 > 0, scores.q3 > 0, !!document.getElementById('branch').value];
+  document.getElementById('progFill').style.width = (req.filter(Boolean).length / req.length * 100) + '%';
+}
+document.getElementById('branch').addEventListener('change', updateProg);
+
+// ── Submit → Google Sheets ──
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const branch = document.getElementById('branch').value;
+  if (!branch)                          { alert('กรุณาเลือกสาขา'); return; }
+  if (!scores.q1||!scores.q2||!scores.q3) { alert('กรุณาให้คะแนน 3 หัวข้อแรก'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  const err = document.getElementById('errBanner');
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spinner"></div> กำลังบันทึก...`;
+  err.style.display = 'none';
+
+  const payload = {
+    branch  : branch,
+    staff   : document.getElementById('staffName').value.trim(),
+    q1      : scores.q1,
+    q2      : scores.q2,
+    q3      : scores.q3,
+    q4      : scores.q4,
+    comment : document.getElementById('comment').value.trim()
+  };
+
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL, {
+      method  : 'POST',
+      mode    : 'no-cors',   // Apps Script ต้องการ no-cors
+      headers : { 'Content-Type': 'application/json' },
+      body    : JSON.stringify(payload)
+    });
+
+    // no-cors → response opaque → ถือว่าสำเร็จถ้าไม่ throw
+    showSuccess(payload);
+
+  } catch (ex) {
+    err.textContent = '❌ ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบการเชื่อมต่อ หรือ URL ของ Apps Script';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> ส่งแบบประเมิน`;
+  }
+});
+
+function showSuccess(payload) {
+  const total = payload.q1 + payload.q2 + payload.q3 + (payload.q4 || 0);
+  const max   = 15 + (payload.q4 ? 5 : 0);
+  document.getElementById('form').style.display = 'none';
+  document.getElementById('successCard').style.display = 'block';
+  document.getElementById('finalScore').textContent = total;
+  document.getElementById('finalOf').textContent = 'จาก ' + max + ' คะแนน';
+  document.getElementById('progFill').style.width = '100%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  Object.keys(scores).forEach(k => scores[k] = 0);
+  document.getElementById('form').reset();
+  if (!autoStaff) document.getElementById('staffName').value = '';
+  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('lit'));
+  document.querySelectorAll('.star-label').forEach(l => { l.textContent = ''; l.classList.remove('on'); });
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> ส่งแบบประเมิน`;
+  document.getElementById('errBanner').style.display = 'none';
+  document.getElementById('form').style.display = 'block';
+  document.getElementById('successCard').style.display = 'none';
+  document.getElementById('progFill').style.width = '0%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
