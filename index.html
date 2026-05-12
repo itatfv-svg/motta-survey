@@ -151,8 +151,12 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 
     <div class="field">
       <label>ชื่อพนักงาน</label>
-      <input type="text" id="staffName" placeholder="ระบุชื่อ หรือ รหัสพนักงาน">
-      <div class="field-note">* สามารถดึงข้อมูลอัตโนมัติจาก QR Code / URL parameter (?staff=ชื่อ)</div>
+      <div class="sel-wrap">
+        <select id="staffName">
+          <option value="">— เลือกสาขาก่อน —</option>
+        </select>
+      </div>
+      <div class="field-note">* รายชื่อ: ตั้งค่า MOTTA_STAFF_SOURCE / APPS_SCRIPT_URL / MOTTA_BRANCH_STAFF ในสคริปต์ด้านล่างของไฟล์นี้ — QR / URL (?branch=…&amp;staff=ชื่อ)</div>
     </div>
   </div>
 
@@ -260,24 +264,145 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 </div>
 
 <script>
-// ══════════════════════════════════════════════════
-//  ⚠️  วาง Web App URL จาก Google Apps Script ตรงนี้
-// ══════════════════════════════════════════════════
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTj3nJ_Nfm3TFeuFcTvO0hnyRboyBBckqpYD1bqF9JMJb5Zv3zYpKcrHTuWKH9LXh-/exec";
+// ═══════════════════════════════════════════════════════════════════
+//  ตั้งค่า (ทุกอย่างอยู่ไฟล์นี้)
+// ═══════════════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0u8z5TiGDXB3MOwtvu-R_SFRY-Nitihh38p9GAE5Vbu26nK9hQhgqmR6EhuqfiXnJ/exec";
+/** "sheet" = ดึงจาก Google Sheet (?action=staffMap) | "local" = ใช้ MOTTA_BRANCH_STAFF ด้านล่างเท่านั้น */
+const MOTTA_STAFF_SOURCE = "sheet";
+const MOTTA_STAFF_SHEET_TAB = "Staff";
 
-// ── ดึงชื่อพนักงานจาก URL param อัตโนมัติ ──
-const urlParams = new URLSearchParams(window.location.search);
-const autoStaff = urlParams.get('staff') || urlParams.get('name') || '';
-if (autoStaff) {
-  document.getElementById('staffName').value = decodeURIComponent(autoStaff);
-  document.getElementById('staffName').readOnly = true;
-  document.getElementById('staffName').style.background = '#F5E8EC';
+let MOTTA_BRANCH_STAFF = {
+  "สาขาสยามสแควร์": ["พนักงาน ก", "พนักงาน ข", "พนักงาน ค"],
+  "สาขาเซ็นทรัลลาดพร้าว": ["พนักงาน ง", "พนักงาน จ"],
+  "สาขาเมกาบางนา": ["พนักงาน ฉ", "พนักงาน ช", "พนักงาน ซ"],
+  "สาขารังสิต": ["พนักงาน ฌ", "พนักงาน ญ"],
+  "สาขาพระราม 2": ["พนักงาน ฎ", "พนักงาน ฏ", "พนักงาน ฐ"],
+  "สาขาเชียงใหม่": ["พนักงาน ฑ", "พนักงาน ฒ"],
+  "อื่น ๆ": ["พนักงาน (อื่น ๆ)"]
+};
+const MOTTA_BRANCH_STAFF_FALLBACK = JSON.parse(JSON.stringify(MOTTA_BRANCH_STAFF));
+
+function mottaStaffMapUrl() {
+  const base = String(APPS_SCRIPT_URL || "").replace(/\/$/, "");
+  if (!base) return "";
+  const sep = base.indexOf("?") >= 0 ? "&" : "?";
+  const tab = MOTTA_STAFF_SHEET_TAB
+    ? "&sheet=" + encodeURIComponent(String(MOTTA_STAFF_SHEET_TAB))
+    : "";
+  return base + sep + "action=staffMap" + tab;
 }
-const autoBranch = urlParams.get('branch') || '';
-if (autoBranch) {
-  const sel = document.getElementById('branch');
-  [...sel.options].forEach(o => { if (o.text.includes(decodeURIComponent(autoBranch))) sel.value = o.value; });
+
+function mottaLoadStaffMapFromSheet() {
+  const url = mottaStaffMapUrl();
+  if (!url) return Promise.resolve(false);
+  return fetch(url, { method: "GET", mode: "cors", cache: "no-store" })
+    .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(data => {
+      if (!data || typeof data !== "object" || Array.isArray(data)) return false;
+      MOTTA_BRANCH_STAFF = data;
+      return true;
+    })
+    .catch(() => {
+      MOTTA_BRANCH_STAFF = JSON.parse(JSON.stringify(MOTTA_BRANCH_STAFF_FALLBACK));
+      return false;
+    });
 }
+
+function mottaFillStaffOptions(branchValue) {
+  const staff = document.getElementById("staffName");
+  if (!staff || staff.tagName !== "SELECT") return;
+  const names = branchValue ? (MOTTA_BRANCH_STAFF[branchValue] || []) : [];
+  staff.innerHTML = "";
+  staff.add(new Option(branchValue ? "— เลือกพนักงาน —" : "— เลือกสาขาก่อน —", "", true, true));
+  names.forEach(n => { if (String(n).trim()) staff.add(new Option(n, n)); });
+}
+
+function mottaLockStaffSelect(on) {
+  const s = document.getElementById("staffName");
+  if (!s) return;
+  s.disabled = !!on;
+  s.style.background = on ? "#F5E8EC" : "";
+}
+
+function mottaApplyUrlParamsOnce() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const staffParam = urlParams.get("staff") || urlParams.get("name") || "";
+  const branchParam = urlParams.get("branch") || "";
+  if (branchParam) window.MOTTA_URL_BRANCH = branchParam;
+  if (staffParam) window.MOTTA_URL_STAFF = staffParam;
+
+  const branchEl = document.getElementById("branch");
+  if (branchParam && branchEl) {
+    const want = decodeURIComponent(branchParam);
+    [...branchEl.options].forEach(o => { if (o.text.includes(want)) branchEl.value = o.value; });
+  }
+
+  mottaFillStaffOptions(branchEl ? branchEl.value : "");
+
+  const staffEl = document.getElementById("staffName");
+  if (staffParam && staffEl) {
+    const name = decodeURIComponent(staffParam);
+    const found = [...staffEl.options].some(o => {
+      if (o.value === name || o.text === name) { staffEl.value = o.value; return true; }
+      return false;
+    });
+    if (!found) staffEl.add(new Option(name, name, true, true));
+    window.MOTTA_AUTO_STAFF_LOCKED = true;
+    mottaLockStaffSelect(true);
+  } else {
+    window.MOTTA_AUTO_STAFF_LOCKED = false;
+  }
+}
+
+function mottaAfterFormReset() {
+  const branchEl = document.getElementById("branch");
+  const staffEl = document.getElementById("staffName");
+  if (!branchEl || !staffEl) return;
+
+  if (window.MOTTA_URL_BRANCH) {
+    const wantB = decodeURIComponent(window.MOTTA_URL_BRANCH);
+    [...branchEl.options].forEach(o => { if (o.text.includes(wantB)) branchEl.value = o.value; });
+  }
+
+  mottaFillStaffOptions(branchEl.value);
+
+  if (window.MOTTA_URL_STAFF) {
+    const name = decodeURIComponent(window.MOTTA_URL_STAFF);
+    const hit = [...staffEl.options].find(o => o.value === name || o.text === name);
+    if (!hit) staffEl.add(new Option(name, name, true, true));
+    else staffEl.value = hit.value;
+    if (window.MOTTA_AUTO_STAFF_LOCKED) mottaLockStaffSelect(true);
+  } else {
+    mottaLockStaffSelect(false);
+  }
+}
+
+function mottaInitStaffUI() {
+  const branchEl = document.getElementById("branch");
+  if (!branchEl) return;
+
+  branchEl.addEventListener("change", () => {
+    window.MOTTA_AUTO_STAFF_LOCKED = false;
+    mottaLockStaffSelect(false);
+    mottaFillStaffOptions(branchEl.value);
+  });
+
+  const afterReady = () => {
+    mottaFillStaffOptions(branchEl.value || "");
+    mottaApplyUrlParamsOnce();
+  };
+
+  if (MOTTA_STAFF_SOURCE === "sheet" && APPS_SCRIPT_URL)
+    mottaLoadStaffMapFromSheet().finally(afterReady);
+  else
+    afterReady();
+}
+
+if (document.readyState === "loading")
+  document.addEventListener("DOMContentLoaded", mottaInitStaffUI);
+else
+  mottaInitStaffUI();
 
 // ── Star rating ──
 const labels = ['','แย่มาก 😞','ต้องปรับปรุง 😕','พอใช้ได้ 😐','ดีมาก 😊','ยอดเยี่ยม 🤩'];
@@ -366,7 +491,6 @@ function showSuccess(payload) {
 function resetForm() {
   Object.keys(scores).forEach(k => scores[k] = 0);
   document.getElementById('form').reset();
-  if (!autoStaff) document.getElementById('staffName').value = '';
   document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('lit'));
   document.querySelectorAll('.star-label').forEach(l => { l.textContent = ''; l.classList.remove('on'); });
   const btn = document.getElementById('submitBtn');
@@ -377,6 +501,7 @@ function resetForm() {
   document.getElementById('successCard').style.display = 'none';
   document.getElementById('progFill').style.width = '0%';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  mottaAfterFormReset();
 }
 </script>
 </body>
