@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Motta — แบบประเมินความพึงพอใจ</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -353,10 +354,7 @@ function applyUrlParams() {
   applyUrlParams();
 })();
 
-document.getElementById("branch").addEventListener("change", function() {
-  fillStaff(this.value);
-  updateProg();
-});
+// branch change handled by Select2
 
 // ═══════════════════════════════════════════════════════════════════
 //  Stars
@@ -498,6 +496,72 @@ function resetForm() {
   }
   window.scrollTo({ top:0, behavior:'smooth' });
 }
+</script>
+
+<!-- Select2 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+<style>
+/* ── Select2 Motta Theme ── */
+.select2-container--default .select2-selection--single{
+  height:46px;padding:10px 16px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  background:var(--pink-pale);
+  display:flex;align-items:center;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered{
+  color:var(--text);font-family:'Sarabun',sans-serif;font-size:15px;
+  padding:0;line-height:1.4;
+}
+.select2-container--default .select2-selection--single .select2-selection__placeholder{color:#C9A0AE}
+.select2-container--default .select2-selection--single .select2-selection__arrow{
+  height:44px;right:12px;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b{
+  border-color:var(--pink) transparent transparent;border-width:6px 5px 0;
+}
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b{
+  border-color:transparent transparent var(--pink);border-width:0 5px 6px;
+}
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single{
+  border-color:var(--pink);background:var(--white);outline:none;
+}
+.select2-dropdown{
+  border:1.5px solid var(--pink);border-radius:var(--r-sm);
+  overflow:hidden;box-shadow:0 8px 24px rgba(239,112,144,.15);
+}
+.select2-search--dropdown{padding:8px}
+.select2-search--dropdown .select2-search__field{
+  padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);
+  font-family:'Sarabun',sans-serif;font-size:14px;outline:none;width:100%;
+  background:var(--pink-pale);
+}
+.select2-search--dropdown .select2-search__field:focus{border-color:var(--pink);background:#fff}
+.select2-results__option{
+  padding:10px 16px;font-family:'Sarabun',sans-serif;font-size:15px;color:var(--text);
+}
+.select2-results__option--highlighted{background:var(--pink-light)!important;color:var(--pink-deep)!important}
+.select2-results__option[aria-selected=true]{background:var(--pink-light);color:var(--pink)}
+.select2-container{width:100%!important}
+.select2-results__message{color:var(--muted);font-family:'Sarabun',sans-serif;font-size:13px}
+</style>
+<script>
+$(function(){
+  $('#branch').select2({
+    placeholder     : '— เลือกสาขา —',
+    allowClear      : true,
+    language        : { noResults: function(){ return 'ไม่พบสาขาที่ค้นหา'; },
+                        searching : function(){ return 'กำลังค้นหา...'; } },
+    width           : '100%',
+    dropdownAutoWidth: false
+  });
+
+  $('#branch').on('change', function(){
+    fillStaff(this.value);
+    updateProg();
+  });
+});
 </script>
 </body>
 </html>
