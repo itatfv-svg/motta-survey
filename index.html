@@ -295,6 +295,22 @@ const _urlStaff  = _p.get("staff")  || _p.get("name") || "";
   }
 })();
 
+/* ── Tap vs Scroll Detection ── */
+function addTap(el, fn){
+  var startY = 0, moved = false;
+  el.addEventListener("touchstart", function(e){
+    startY = e.touches[0].clientY;
+    moved = false;
+  }, {passive:true});
+  el.addEventListener("touchmove", function(e){
+    if(Math.abs(e.touches[0].clientY - startY) > 8) moved = true;
+  }, {passive:true});
+  el.addEventListener("touchend", function(e){
+    if(!moved){ e.preventDefault(); fn(); }
+  });
+  el.addEventListener("click", fn);
+}
+
 /* ── Picker Logic ── */
 function setBranch(val, lock){
   document.getElementById("branch").value = val;
@@ -360,8 +376,7 @@ function openSheet(mode){
       const d = document.createElement("div");
       d.className = "sheet-item" + (b===cur?" selected":"");
       d.textContent = b;
-      d.addEventListener("touchend", function(e){ e.preventDefault(); pickItem(b); });
-      d.addEventListener("click", function(){ pickItem(b); });
+      addTap(d, ()=>pickItem(b));
       list.appendChild(d);
     });
   } else {
@@ -377,8 +392,7 @@ function openSheet(mode){
         const d = document.createElement("div");
         d.className = "sheet-item" + (n===cur?" selected":"");
         d.textContent = n;
-        d.addEventListener("touchend", function(e){ e.preventDefault(); pickItem(n); });
-        d.addEventListener("click", function(){ pickItem(n); });
+        addTap(d, ()=>pickItem(n));
         list.appendChild(d);
       });
     }
