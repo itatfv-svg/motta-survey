@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Motta — แบบประเมินความพึงพอใจ</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -33,11 +32,30 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .field{margin-bottom:16px}
 .field:last-child{margin-bottom:0}
 .field label{display:block;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
-.field input,.field select,.field textarea{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:15px;color:var(--text);background:var(--pink-pale);outline:none;transition:border-color .2s,background .2s;appearance:none}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink);background:var(--white)}
+.field input,.field textarea{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:15px;color:var(--text);background:var(--pink-pale);outline:none;transition:border-color .2s,background .2s;appearance:none}
+.field input:focus,.field textarea:focus{border-color:var(--pink);background:var(--white)}
 .field input::placeholder,.field textarea::placeholder{color:#C9A0AE;font-size:14px}
+/* Native select — ทำงานได้ทุก WebView บน Android */
 .sel-wrap{position:relative}
 .sel-wrap::after{content:'';position:absolute;right:16px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-top:6px solid var(--pink);pointer-events:none}
+.field select{
+  width:100%;
+  padding:12px 40px 12px 16px;
+  border:1.5px solid var(--border);
+  border-radius:var(--r-sm);
+  font-family:'Sarabun',sans-serif;
+  font-size:15px;
+  color:var(--text);
+  background:var(--pink-pale);
+  outline:none;
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.field select:focus{border-color:var(--pink);background:var(--white)}
+.field select:disabled{opacity:.6;cursor:default}
 .field-note{font-size:11px;color:var(--muted);margin-top:5px;padding-left:2px}
 .star-question{margin-bottom:24px}
 .star-question:last-child{margin-bottom:0}
@@ -73,24 +91,6 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .saved-badge svg{width:14px;height:14px;stroke:#27AE60;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .btn-reset{padding:12px 36px;border:1.5px solid var(--pink);border-radius:var(--r-sm);color:var(--pink);background:none;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
 .btn-reset:hover{background:var(--pink);color:#fff}
-/* Select2 Motta Theme */
-.select2-container--default .select2-selection--single{height:46px;padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--pink-pale);display:flex;align-items:center}
-.select2-container--default .select2-selection--single .select2-selection__rendered{color:var(--text);font-family:'Sarabun',sans-serif;font-size:15px;padding:0;line-height:1.4}
-.select2-container--default .select2-selection--single .select2-selection__placeholder{color:#C9A0AE}
-.select2-container--default .select2-selection--single .select2-selection__arrow{height:44px;right:12px}
-.select2-container--default .select2-selection--single .select2-selection__arrow b{border-color:var(--pink) transparent transparent;border-width:6px 5px 0}
-.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b{border-color:transparent transparent var(--pink);border-width:0 5px 6px}
-.select2-container--default.select2-container--focus .select2-selection--single,
-.select2-container--default.select2-container--open .select2-selection--single{border-color:var(--pink);background:var(--white);outline:none}
-.select2-dropdown{border:1.5px solid var(--pink);border-radius:var(--r-sm);overflow:hidden;box-shadow:0 8px 24px rgba(239,112,144,.15)}
-.select2-search--dropdown{padding:8px}
-.select2-search--dropdown .select2-search__field{padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:14px;outline:none;width:100%;background:var(--pink-pale)}
-.select2-search--dropdown .select2-search__field:focus{border-color:var(--pink);background:#fff}
-.select2-results__option{padding:10px 16px;font-family:'Sarabun',sans-serif;font-size:15px;color:var(--text)}
-.select2-results__option--highlighted{background:var(--pink-light)!important;color:var(--pink-deep)!important}
-.select2-results__option[aria-selected=true]{background:var(--pink-light);color:var(--pink)}
-.select2-container{width:100%!important}
-.select2-results__message{color:var(--muted);font-family:'Sarabun',sans-serif;font-size:13px}
 @media(min-width:600px){
   .hero{padding:56px 40px 44px}
   .logo-wrap svg{width:140px}
@@ -125,7 +125,6 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
   <div class="card">
     <div class="card-head"><div class="card-dot"></div><div class="card-title">ข้อมูลการรับบริการ</div></div>
 
-        <!-- ✅ แก้แล้ว: เบอร์โทรศัพท์ถูกต้องสมบูรณ์ -->
     <div class="field">
       <label>เบอร์โทรศัพท์ลูกค้า</label>
       <input type="tel" id="phone" placeholder="0812345678" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" required>
@@ -343,6 +342,12 @@ document.getElementById("phone").addEventListener("input",function(){
   this.value=this.value.replace(/[^0-9]/g,"").slice(0,10);
 });
 
+// Branch change — native select ใช้ได้ทุก WebView
+document.getElementById("branch").addEventListener("change",function(){
+  fillStaff(this.value);
+  updateProg();
+});
+
 // Stars
 const starLabels=["","แย่มาก 😞","ต้องปรับปรุง 😕","พอใช้ได้ 😐","ดีมาก 😊","ยอดเยี่ยม 🤩"];
 const scores={q1:0,q2:0};
@@ -473,27 +478,6 @@ function resetForm(){
   }
   window.scrollTo({top:0,behavior:"smooth"});
 }
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
-<script>
-$(function(){
-  $("#branch").select2({
-    placeholder:"— เลือกสาขา —",
-    allowClear:true,
-    language:{
-      noResults:function(){return "ไม่พบสาขาที่ค้นหา";},
-      searching:function(){return "กำลังค้นหา...";}
-    },
-    width:"100%",
-    dropdownAutoWidth:false
-  });
-  $("#branch").on("change",function(){
-    fillStaff(this.value);
-    updateProg();
-  });
-});
 </script>
 </body>
 </html>
