@@ -287,14 +287,25 @@ const SB_HEADERS = {
 const CACHE_KEY="motta_staff_v2", CACHE_MIN=15;
 let staffMap={};
 
+// ใช้ setTimeout แทน AbortSignal.timeout() เพื่อรองรับ Android WebView ทุกเวอร์ชัน
+function fetchWithTimeout(url, options, ms){
+  return new Promise((resolve, reject)=>{
+    const timer = setTimeout(()=>reject(new Error("timeout")), ms);
+    fetch(url, options).then(r=>{clearTimeout(timer);resolve(r);}).catch(e=>{clearTimeout(timer);reject(e);});
+  });
+}
+
 async function loadStaff(){
   try{
     const raw=sessionStorage.getItem(CACHE_KEY);
     if(raw){const c=JSON.parse(raw);if(Date.now()-c.t<CACHE_MIN*60000){staffMap=c.d;return;}}
   }catch(_){}
   try{
-    const res=await fetch(SUPABASE_URL+"/rest/v1/staff?select=branch,name&active=eq.true&order=branch,name",
-      {headers:SB_HEADERS,signal:AbortSignal.timeout(6000)});
+    const res=await fetchWithTimeout(
+      SUPABASE_URL+"/rest/v1/staff?select=branch,name&active=eq.true&order=branch,name",
+      {headers:SB_HEADERS},
+      8000
+    );
     if(!res.ok)return;
     const rows=await res.json();
     const map={};
@@ -335,7 +346,13 @@ function applyUrlParams(){
   }
 }
 
-(async()=>{await loadStaff();applyUrlParams();})();
+// แสดง loading ระหว่างโหลดรายชื่อ แล้วค่อย applyUrlParams — ป้องกัน race condition
+(async()=>{
+  const staffSel=document.getElementById("staffName");
+  staffSel.innerHTML="<option value=''>กำลังโหลดข้อมูล...</option>";
+  await loadStaff();
+  applyUrlParams();
+})();
 
 // กรองเฉพาะตัวเลข + จำกัด 10 หลัก
 document.getElementById("phone").addEventListener("input",function(){
@@ -399,11 +416,11 @@ async function sendToSupabase(payload,retry=3){
   });
   for(let i=1;i<=retry;i++){
     try{
-      const res=await fetch(SUPABASE_URL+"/rest/v1/responses",{
+      const res=await fetchWithTimeout(SUPABASE_URL+"/rest/v1/responses",{
         method:"POST",
         headers:{...SB_HEADERS,"Prefer":"return=minimal"},
-        body,signal:AbortSignal.timeout(8000)
-      });
+        body
+      },8000);
       if(res.status===201||res.status===409)return true;
       throw new Error("HTTP "+res.status);
     }catch(e){if(i<retry)await new Promise(r=>setTimeout(r,1500*i));}
