@@ -147,7 +147,7 @@ log("📱 UA: "+navigator.userAgent.slice(0,80));
     <div class="field">
       <label>สาขา <span class="req">*</span></label>
       <div class="sel-wrap">
-        <select id="branch" required>
+        <select id="branch" required onchange="onBranchChange()" onclick="onBranchChange()">
           <option value="">— เลือกสาขา —</option>
           <option>เซ็นทรัลอีสต์วิลล์</option>
           <option>เซ็นทรัลปิ่นเกล้า</option>
@@ -389,11 +389,21 @@ document.getElementById("phone").addEventListener("input",function(){
   this.value=this.value.replace(/[^0-9]/g,"").slice(0,10);
 });
 
-// Branch change — native select ใช้ได้ทุก WebView
-document.getElementById("branch").addEventListener("change",function(){
-  fillStaff(this.value);
+let _lastBranch = "";
+function onBranchChange(){
+  const val = document.getElementById("branch").value;
+  if(val === _lastBranch) return;
+  _lastBranch = val;
+  log("🔀 branch changed: '"+val+"'");
+  fillStaff(val);
   updateProg();
-});
+}
+document.getElementById("branch").addEventListener("change", onBranchChange);
+document.getElementById("branch").addEventListener("click", onBranchChange);
+setInterval(function(){
+  const val = document.getElementById("branch").value;
+  if(val !== _lastBranch){ log("⏱ polling detected branch: '"+val+"'"); onBranchChange(); }
+}, 300);
 
 // Stars
 const starLabels=["","แย่มาก 😞","ต้องปรับปรุง 😕","พอใช้ได้ 😐","ดีมาก 😊","ยอดเยี่ยม 🤩"];
