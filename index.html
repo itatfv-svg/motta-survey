@@ -35,43 +35,65 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .field input,.field textarea{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:15px;color:var(--text);background:var(--pink-pale);outline:none;transition:border-color .2s,background .2s;appearance:none}
 .field input:focus,.field textarea:focus{border-color:var(--pink);background:var(--white)}
 .field input::placeholder,.field textarea::placeholder{color:#C9A0AE;font-size:14px}
-/* Native select — ทำงานได้ทุก WebView บน Android */
-.sel-wrap{position:relative}
-.sel-wrap::after{content:'';position:absolute;right:16px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-top:6px solid var(--pink);pointer-events:none}
-.field select{
-  width:100%;
-  padding:12px 40px 12px 16px;
-  border:1.5px solid var(--border);
-  border-radius:var(--r-sm);
-  font-family:'Sarabun',sans-serif;
-  font-size:15px;
-  color:var(--text);
-  background:var(--pink-pale);
-  outline:none;
-  appearance:none;
-  -webkit-appearance:none;
-  -moz-appearance:none;
-  cursor:pointer;
-  transition:border-color .2s,background .2s;
-}
-.field select:focus{border-color:var(--pink);background:var(--white)}
-.field select:disabled{opacity:.6;cursor:default}
 .field-note{font-size:11px;color:var(--muted);margin-top:5px;padding-left:2px}
+
+/* ── Custom Picker Button (แทน <select>) ── */
+.picker-btn{
+  width:100%;padding:12px 40px 12px 16px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  font-family:'Sarabun',sans-serif;font-size:15px;
+  color:var(--text);background:var(--pink-pale);
+  outline:none;cursor:pointer;text-align:left;
+  position:relative;transition:border-color .2s,background .2s;
+  display:flex;align-items:center;justify-content:space-between;
+  -webkit-tap-highlight-color:transparent;
+}
+.picker-btn.placeholder{color:#C9A0AE}
+.picker-btn:active{background:var(--white);border-color:var(--pink)}
+.picker-btn.open{border-color:var(--pink);background:var(--white)}
+.picker-btn.disabled{opacity:.6;cursor:default;pointer-events:none}
+.picker-arrow{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--pink);flex-shrink:0;margin-left:8px;transition:transform .2s}
+.picker-btn.open .picker-arrow{transform:rotate(180deg)}
+
+/* ── Bottom Sheet ── */
+.sheet-overlay{
+  display:none;position:fixed;inset:0;background:rgba(42,26,31,.45);
+  z-index:9000;-webkit-tap-highlight-color:transparent;
+  opacity:0;transition:opacity .25s;
+}
+.sheet-overlay.show{display:flex;align-items:flex-end}
+.sheet-overlay.visible{opacity:1}
+.sheet{
+  width:100%;max-height:72vh;background:var(--white);
+  border-radius:20px 20px 0 0;overflow:hidden;
+  display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,1,.2,1);
+}
+.sheet-overlay.visible .sheet{transform:translateY(0)}
+.sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 0}
+.sheet-title{font-size:14px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:10px 16px 14px;border-bottom:1px solid var(--border)}
+.sheet-search{padding:10px 16px;border-bottom:1px solid var(--border)}
+.sheet-search input{width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:15px;color:var(--text);background:var(--pink-pale);outline:none;-webkit-appearance:none}
+.sheet-search input:focus{border-color:var(--pink);background:var(--white)}
+.sheet-list{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+.sheet-item{padding:15px 20px;font-size:15px;color:var(--text);border-bottom:1px solid #FAF0F3;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .1s}
+.sheet-item:active,.sheet-item.selected{background:var(--pink-light);color:var(--pink);font-weight:600}
+.sheet-item.hidden{display:none}
+.sheet-empty{padding:28px;text-align:center;color:var(--muted);font-size:14px}
+
 .star-question{margin-bottom:24px}
 .star-question:last-child{margin-bottom:0}
 .q-label{font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px;line-height:1.5}
 .q-sub{font-size:12px;color:var(--muted);margin-bottom:12px}
 .stars{display:flex;gap:6px}
-.star-btn{background:none;border:none;cursor:pointer;padding:2px;transition:transform .15s;line-height:1}
-.star-btn:hover{transform:scale(1.15)}
+.star-btn{background:none;border:none;cursor:pointer;padding:2px;transition:transform .15s;line-height:1;-webkit-tap-highlight-color:transparent}
 .star-btn:active{transform:scale(.9)}
 .star-btn svg{width:42px;height:42px;display:block;fill:#F0D0D8;stroke:#E8AABB;stroke-width:1;transition:fill .15s,stroke .15s}
 .star-btn.lit svg{fill:var(--pink);stroke:var(--pink-deep)}
 .star-label{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px;transition:color .2s;font-style:italic}
 .star-label.on{color:var(--pink);font-weight:500}
 .field textarea{min-height:96px;resize:vertical;line-height:1.7}
-.btn-submit{width:100%;padding:18px;background:var(--pink);color:#fff;border:none;border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:17px;font-weight:600;cursor:pointer;letter-spacing:.04em;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 6px 24px rgba(239,112,144,.35);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
-.btn-submit:hover:not(:disabled){background:var(--pink-deep);box-shadow:0 8px 28px rgba(239,112,144,.45)}
+.btn-submit{width:100%;padding:18px;background:var(--pink);color:#fff;border:none;border-radius:var(--r-sm);font-family:'Sarabun',sans-serif;font-size:17px;font-weight:600;cursor:pointer;letter-spacing:.04em;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 6px 24px rgba(239,112,144,.35);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;-webkit-tap-highlight-color:transparent}
 .btn-submit:active:not(:disabled){transform:scale(.98)}
 .btn-submit:disabled{opacity:.6;cursor:not-allowed}
 .spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
@@ -90,7 +112,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .saved-badge{display:inline-flex;align-items:center;gap:6px;background:#EAF7EF;border:1px solid #A8DFBE;border-radius:50px;padding:5px 14px;font-size:12px;color:#27AE60;font-weight:600;margin-bottom:20px}
 .saved-badge svg{width:14px;height:14px;stroke:#27AE60;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .btn-reset{padding:12px 36px;border:1.5px solid var(--pink);border-radius:var(--r-sm);color:var(--pink);background:none;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
-.btn-reset:hover{background:var(--pink);color:#fff}
+.btn-reset:active{background:var(--pink);color:#fff}
 @media(min-width:600px){
   .hero{padding:56px 40px 44px}
   .logo-wrap svg{width:140px}
@@ -119,20 +141,6 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
 
-<!-- DEBUG PANEL — ลบออกหลังแก้ปัญหาเสร็จ -->
-<div id="dbg" style="background:#1a1a2e;color:#00ff88;font-family:monospace;font-size:11px;padding:10px 14px;max-height:160px;overflow-y:auto;line-height:1.7;white-space:pre-wrap;word-break:break-all;"></div>
-<script>
-function log(msg){
-  const d=document.getElementById("dbg");
-  if(!d)return;
-  d.textContent+="["+new Date().toISOString().slice(11,19)+"] "+msg+"\n";
-  d.scrollTop=d.scrollHeight;
-}
-window.onerror=function(m,s,l){log("❌ JS ERROR: "+m+" ("+s+":"+l+")");};
-window.onunhandledrejection=function(e){log("❌ PROMISE: "+(e.reason?.message||e.reason));};
-log("📱 UA: "+navigator.userAgent.slice(0,80));
-</script>
-
 <div class="wrap">
 <form id="form">
 
@@ -141,91 +149,25 @@ log("📱 UA: "+navigator.userAgent.slice(0,80));
 
     <div class="field">
       <label>เบอร์โทรศัพท์ลูกค้า</label>
-      <input type="tel" id="phone" placeholder="0812345678" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" required>
+      <input type="tel" id="phone" placeholder="0812345678" maxlength="10" inputmode="numeric">
     </div>
 
     <div class="field">
       <label>สาขา <span class="req">*</span></label>
-      <div class="sel-wrap">
-        <select id="branch" required onchange="onBranchChange()" onclick="onBranchChange()">
-          <option value="">— เลือกสาขา —</option>
-          <option>เซ็นทรัลอีสต์วิลล์</option>
-          <option>เซ็นทรัลปิ่นเกล้า</option>
-          <option>เซ็นทรัลเวสเกต</option>
-          <option>เซ็นทรัลแจ้งวัฒนะ</option>
-          <option>เซ็นทรัลศาลายา</option>
-          <option>เซ็นทรัลมหาชัย</option>
-          <option>เซ็นทรัลลาดพร้าว</option>
-          <option>เดอะมอลล์บางกะปิ</option>
-          <option>ฉะเชิงเทรา</option>
-          <option>โคราช</option>
-          <option>อุบล</option>
-          <option>ขอนแก่น</option>
-          <option>เดอะมอลล์ท่าพระ</option>
-          <option>เซ็นทรัลภูเก็ต</option>
-          <option>เซ็นทรัลหาดใหญ่</option>
-          <option>เซ็นทรัลนครศรีธรรมราช</option>
-          <option>พัทยา</option>
-          <option>ชลบุรี</option>
-          <option>เชียงใหม่เฟส</option>
-          <option>โรบินสันตรัง</option>
-          <option>ลาดกระบัง</option>
-          <option>โรบินสันสุพรรณบุรี</option>
-          <option>บ่อวิน</option>
-          <option>เดอะมอลล์งามวงศ์วาน</option>
-          <option>แฟชั่นไอส์แลนด์</option>
-          <option>ลพบุรี</option>
-          <option>อมตะ ชลบุรี</option>
-          <option>เซ็นทรัลพระราม9</option>
-          <option>ลำปาง</option>
-          <option>สระบุรี</option>
-          <option>พิษณุโลก</option>
-          <option>เซ็นทรัลสุราษฎร์ธานี</option>
-          <option>ศรีราชา</option>
-          <option>อยุธยา</option>
-          <option>อุดร</option>
-          <option>จันทบุรี</option>
-          <option>เซ็นทรัลพระราม2</option>
-          <option>เชียงราย</option>
-          <option>ฟิวเจอร์รังสิต</option>
-          <option>ระยอง</option>
-          <option>นครสวรรค์</option>
-          <option>โรบินสันราชบุรี</option>
-          <option>สำโรง</option>
-          <option>เสริมไทย</option>
-          <option>ซีคอนสแควร์</option>
-          <option>สมุทปราการ</option>
-          <option>เดอะมอลล์โคราช</option>
-          <option>โรบินสันกาญจนบุรี</option>
-          <option>โรบินสันศรีสมาน</option>
-          <option>แพชชั่นระยอง</option>
-          <option>ปราจีนบุรี</option>
-          <option>ร้อยเอ็ด</option>
-          <option>บุรีรัมย์</option>
-          <option>เดอะมอลล์บางแค</option>
-          <option>สกลนคร</option>
-          <option>เชียงใหม่แอร์พอร์ต</option>
-          <option>โรบินสันถลาง</option>
-          <option>เซ็นทรัลกระบี่</option>
-          <option>พระราม3</option>
-          <option>เซ็นทรัลนครปฐม</option>
-          <option>สุวรรณภูมิ</option>
-          <option>สุรินทร์</option>
-          <option>มุกดาหาร</option>
-          <option>ขอนแก่นแคมปัส</option>
-          <option>ลาดกระบัง</option>
-          <option>อื่นๆ</option>
-        </select>
-      </div>
+      <button type="button" class="picker-btn placeholder" id="branchBtn" onclick="openSheet('branch')">
+        <span id="branchLabel">— เลือกสาขา —</span>
+        <span class="picker-arrow"></span>
+      </button>
+      <input type="hidden" id="branch" required>
     </div>
 
     <div class="field">
       <label>ชื่อพนักงาน</label>
-      <div class="sel-wrap">
-        <select id="staffName">
-          <option value="">— เลือกสาขาก่อน —</option>
-        </select>
-      </div>
+      <button type="button" class="picker-btn placeholder disabled" id="staffBtn" onclick="openSheet('staff')">
+        <span id="staffLabel">— เลือกสาขาก่อน —</span>
+        <span class="picker-arrow"></span>
+      </button>
+      <input type="hidden" id="staffName">
       <div class="field-note">* รายชื่อดึงอัตโนมัติเมื่อเลือกสาขา</div>
     </div>
   </div>
@@ -288,129 +230,211 @@ log("📱 UA: "+navigator.userAgent.slice(0,80));
 </div>
 </div>
 
+<!-- Bottom Sheet Overlay -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="overlayClick(event)">
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="sheetTitle">เลือกสาขา</div>
+    <div class="sheet-search" id="sheetSearchWrap">
+      <input type="text" id="sheetSearch" placeholder="ค้นหา..." oninput="filterSheet(this.value)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
+    <div class="sheet-list" id="sheetList"></div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = "https://rmcwjhlwabphuyhnbqar.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtY3dqaGx3YWJwaHV5aG5icWFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1ODYxMDMsImV4cCI6MjA5NDE2MjEwM30.l4_-__JqLygaVx0qU2bhCg57oFTIP_Q5gcfyj806-7o";
-const SB_HEADERS = {
-  "Content-Type":"application/json",
-  "apikey":SUPABASE_KEY,
-  "Authorization":"Bearer "+SUPABASE_KEY
-};
+const SB_HEADERS = {"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY};
 
-// Staff cache
-const CACHE_KEY="motta_staff_v2", CACHE_MIN=15;
-let staffMap={};
+const BRANCHES = ["เซ็นทรัลอีสต์วิลล์","เซ็นทรัลปิ่นเกล้า","เซ็นทรัลเวสเกต","เซ็นทรัลแจ้งวัฒนะ","เซ็นทรัลศาลายา","เซ็นทรัลมหาชัย","เซ็นทรัลลาดพร้าว","เดอะมอลล์บางกะปิ","ฉะเชิงเทรา","โคราช","อุบล","ขอนแก่น","เดอะมอลล์ท่าพระ","เซ็นทรัลภูเก็ต","เซ็นทรัลหาดใหญ่","เซ็นทรัลนครศรีธรรมราช","พัทยา","ชลบุรี","เชียงใหม่เฟส","โรบินสันตรัง","ลาดกระบัง","โรบินสันสุพรรณบุรี","บ่อวิน","เดอะมอลล์งามวงศ์วาน","แฟชั่นไอส์แลนด์","ลพบุรี","อมตะ ชลบุรี","เซ็นทรัลพระราม9","ลำปาง","สระบุรี","พิษณุโลก","เซ็นทรัลสุราษฎร์ธานี","ศรีราชา","อยุธยา","อุดร","จันทบุรี","เซ็นทรัลพระราม2","เชียงราย","ฟิวเจอร์รังสิต","ระยอง","นครสวรรค์","โรบินสันราชบุรี","สำโรง","เสริมไทย","ซีคอนสแควร์","สมุทปราการ","เดอะมอลล์โคราช","โรบินสันกาญจนบุรี","โรบินสันศรีสมาน","แพชชั่นระยอง","ปราจีนบุรี","ร้อยเอ็ด","บุรีรัมย์","เดอะมอลล์บางแค","สกลนคร","เชียงใหม่แอร์พอร์ต","โรบินสันถลาง","เซ็นทรัลกระบี่","พระราม3","เซ็นทรัลนครปฐม","สุวรรณภูมิ","สุรินทร์","มุกดาหาร","ขอนแก่นแคมปัส","อื่นๆ"];
 
-// ใช้ setTimeout แทน AbortSignal.timeout() เพื่อรองรับ Android WebView ทุกเวอร์ชัน
-function fetchWithTimeout(url, options, ms){
-  return new Promise((resolve, reject)=>{
-    const timer = setTimeout(()=>reject(new Error("timeout")), ms);
-    fetch(url, options).then(r=>{clearTimeout(timer);resolve(r);}).catch(e=>{clearTimeout(timer);reject(e);});
+const CACHE_KEY = "motta_staff_v2", CACHE_MIN = 15;
+let staffMap = {};
+let _sheetMode = "branch"; // "branch" | "staff"
+
+function fetchWithTimeout(url, opts, ms){
+  return new Promise((res,rej)=>{
+    const t=setTimeout(()=>rej(new Error("timeout")),ms);
+    fetch(url,opts).then(r=>{clearTimeout(t);res(r);}).catch(e=>{clearTimeout(t);rej(e);});
   });
 }
 
 async function loadStaff(){
-  log("🔄 loadStaff start");
   try{
     const raw=sessionStorage.getItem(CACHE_KEY);
-    if(raw){
-      const c=JSON.parse(raw);
-      if(Date.now()-c.t<CACHE_MIN*60000){
-        staffMap=c.d;
-        log("✅ cache hit, branches: "+Object.keys(staffMap).length);
-        return;
-      }
-    }
-  }catch(e){log("⚠️ cache read err: "+e.message);}
+    if(raw){const c=JSON.parse(raw);if(Date.now()-c.t<CACHE_MIN*60000){staffMap=c.d;return;}}
+  }catch(e){}
   try{
-    log("📡 fetching Supabase...");
-    const res=await fetchWithTimeout(
-      SUPABASE_URL+"/rest/v1/staff?select=branch,name&active=eq.true&order=branch,name",
-      {headers:SB_HEADERS},
-      8000
-    );
-    log("📥 status: "+res.status);
-    if(!res.ok){log("❌ not ok: "+res.status);return;}
+    const res=await fetchWithTimeout(SUPABASE_URL+"/rest/v1/staff?select=branch,name&active=eq.true&order=branch,name",{headers:SB_HEADERS},8000);
+    if(!res.ok)return;
     const rows=await res.json();
-    log("📦 rows: "+rows.length);
     const map={};
     rows.forEach(r=>{if(!r.branch||!r.name)return;if(!map[r.branch])map[r.branch]=[];map[r.branch].push(r.name);});
     staffMap=map;
-    log("✅ branches loaded: "+Object.keys(map).length);
     sessionStorage.setItem(CACHE_KEY,JSON.stringify({t:Date.now(),d:map}));
-  }catch(e){log("❌ fetch error: "+e.message);}
-}
-
-function fillStaff(branch){
-  log("👥 fillStaff branch='"+branch+"' names="+(staffMap[branch]||[]).length);
-  const sel=document.getElementById("staffName");
-  const names=branch?(staffMap[branch]||[]):[];
-  sel.innerHTML="";
-  sel.add(new Option(branch?"— เลือกพนักงาน —":"— เลือกสาขาก่อน —","",true,true));
-  names.forEach(n=>sel.add(new Option(n,n)));
+  }catch(e){}
 }
 
 // URL params
-const _p=new URLSearchParams(location.search);
-const _urlBranch=_p.get("branch")||"";
-const _urlStaff=_p.get("staff")||_p.get("name")||"";
+const _p = new URLSearchParams(location.search);
+const _urlBranch = _p.get("branch") || "";
+const _urlStaff  = _p.get("staff")  || _p.get("name") || "";
 
-function applyUrlParams(){
-  const branchEl=document.getElementById("branch");
-  if(_urlBranch){
-    const want=decodeURIComponent(_urlBranch);
-    [...branchEl.options].forEach(o=>{if(o.text.includes(want))branchEl.value=o.value;});
-    branchEl.disabled=true;
-    updateProg();
-  }
-  fillStaff(branchEl.value);
-  if(_urlStaff){
-    const staffEl=document.getElementById("staffName");
-    const name=decodeURIComponent(_urlStaff);
-    if(![...staffEl.options].some(o=>{if(o.text===name){staffEl.value=o.value;return true;}}))
-      staffEl.add(new Option(name,name,true,true));
-    staffEl.disabled=true;
-  }
-}
-
-// แสดง loading ระหว่างโหลดรายชื่อ แล้วค่อย applyUrlParams — ป้องกัน race condition
 (async()=>{
-  log("🚀 init start");
-  const staffSel=document.getElementById("staffName");
-  staffSel.innerHTML="<option value=''>กำลังโหลดข้อมูล...</option>";
   await loadStaff();
-  log("✅ loadStaff done, calling applyUrlParams");
-  applyUrlParams();
-  log("✅ applyUrlParams done");
+  if(_urlBranch){
+    const want = decodeURIComponent(_urlBranch);
+    const match = BRANCHES.find(b=>b===want) || BRANCHES.find(b=>b.includes(want)) || want;
+    setBranch(match, true);
+  }
+  if(_urlStaff){
+    const name = decodeURIComponent(_urlStaff);
+    setStaff(name, true);
+  }
 })();
 
-// กรองเฉพาะตัวเลข + จำกัด 10 หลัก
-document.getElementById("phone").addEventListener("input",function(){
-  this.value=this.value.replace(/[^0-9]/g,"").slice(0,10);
-});
-
-let _lastBranch = "";
-function onBranchChange(){
-  const val = document.getElementById("branch").value;
-  if(val === _lastBranch) return;
-  _lastBranch = val;
-  log("🔀 branch changed: '"+val+"'");
-  fillStaff(val);
+/* ── Picker Logic ── */
+function setBranch(val, lock){
+  document.getElementById("branch").value = val;
+  const btn = document.getElementById("branchBtn");
+  const lbl = document.getElementById("branchLabel");
+  if(val){
+    lbl.textContent = val;
+    btn.classList.remove("placeholder");
+  } else {
+    lbl.textContent = "— เลือกสาขา —";
+    btn.classList.add("placeholder");
+  }
+  if(lock){ btn.classList.add("disabled"); btn.disabled=true; }
+  // update staff picker
+  const staffBtn = document.getElementById("staffBtn");
+  const staffLbl = document.getElementById("staffLabel");
+  document.getElementById("staffName").value = "";
+  if(val){
+    staffBtn.classList.remove("disabled");
+    staffBtn.disabled = false;
+    staffLbl.textContent = "— เลือกพนักงาน —";
+    staffBtn.classList.add("placeholder");
+  } else {
+    staffBtn.classList.add("disabled");
+    staffBtn.disabled = true;
+    staffLbl.textContent = "— เลือกสาขาก่อน —";
+    staffBtn.classList.add("placeholder");
+  }
   updateProg();
 }
-document.getElementById("branch").addEventListener("change", onBranchChange);
-document.getElementById("branch").addEventListener("click", onBranchChange);
-setInterval(function(){
-  const val = document.getElementById("branch").value;
-  if(val !== _lastBranch){ log("⏱ polling detected branch: '"+val+"'"); onBranchChange(); }
-}, 300);
 
-// Stars
-const starLabels=["","แย่มาก 😞","ต้องปรับปรุง 😕","พอใช้ได้ 😐","ดีมาก 😊","ยอดเยี่ยม 🤩"];
-const scores={q1:0,q2:0};
+function setStaff(val, lock){
+  document.getElementById("staffName").value = val;
+  const btn = document.getElementById("staffBtn");
+  const lbl = document.getElementById("staffLabel");
+  if(val){
+    lbl.textContent = val;
+    btn.classList.remove("placeholder");
+  } else {
+    lbl.textContent = "— เลือกพนักงาน —";
+    btn.classList.add("placeholder");
+  }
+  if(lock){ btn.classList.add("disabled"); btn.disabled=true; }
+}
+
+/* ── Sheet Open/Close ── */
+function openSheet(mode){
+  _sheetMode = mode;
+  const overlay = document.getElementById("sheetOverlay");
+  const list    = document.getElementById("sheetList");
+  const title   = document.getElementById("sheetTitle");
+  const search  = document.getElementById("sheetSearch");
+  const searchWrap = document.getElementById("sheetSearchWrap");
+
+  search.value = "";
+  list.innerHTML = "";
+
+  if(mode === "branch"){
+    title.textContent = "เลือกสาขา";
+    searchWrap.style.display = "";
+    const cur = document.getElementById("branch").value;
+    BRANCHES.forEach(b=>{
+      const d = document.createElement("div");
+      d.className = "sheet-item" + (b===cur?" selected":"");
+      d.textContent = b;
+      d.addEventListener("touchend", function(e){ e.preventDefault(); pickItem(b); });
+      d.addEventListener("click", function(){ pickItem(b); });
+      list.appendChild(d);
+    });
+  } else {
+    title.textContent = "เลือกพนักงาน";
+    const branch = document.getElementById("branch").value;
+    const names  = staffMap[branch] || [];
+    searchWrap.style.display = names.length > 5 ? "" : "none";
+    const cur = document.getElementById("staffName").value;
+    if(names.length === 0){
+      list.innerHTML = '<div class="sheet-empty">ไม่พบรายชื่อพนักงาน</div>';
+    } else {
+      names.forEach(n=>{
+        const d = document.createElement("div");
+        d.className = "sheet-item" + (n===cur?" selected":"");
+        d.textContent = n;
+        d.addEventListener("touchend", function(e){ e.preventDefault(); pickItem(n); });
+        d.addEventListener("click", function(){ pickItem(n); });
+        list.appendChild(d);
+      });
+    }
+  }
+
+  overlay.style.display = "flex";
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{ overlay.classList.add("visible"); });
+  });
+  document.body.style.overflow = "hidden";
+}
+
+function closeSheet(){
+  const overlay = document.getElementById("sheetOverlay");
+  overlay.classList.remove("visible");
+  setTimeout(()=>{ overlay.style.display="none"; document.body.style.overflow=""; }, 280);
+  document.getElementById("branchBtn").classList.remove("open");
+  document.getElementById("staffBtn").classList.remove("open");
+}
+
+function overlayClick(e){
+  if(e.target === document.getElementById("sheetOverlay")) closeSheet();
+}
+
+function pickItem(val){
+  if(_sheetMode === "branch"){
+    setBranch(val, false);
+  } else {
+    setStaff(val, false);
+  }
+  closeSheet();
+}
+
+function filterSheet(q){
+  const items = document.getElementById("sheetList").querySelectorAll(".sheet-item");
+  const lq = q.toLowerCase();
+  let found = 0;
+  items.forEach(item=>{
+    const match = item.textContent.toLowerCase().includes(lq);
+    item.classList.toggle("hidden", !match);
+    if(match) found++;
+  });
+  const empty = document.getElementById("sheetList").querySelector(".sheet-empty");
+  if(empty) empty.style.display = found===0 ? "block":"none";
+}
+
+/* ── Phone ── */
+document.getElementById("phone").addEventListener("input", function(){
+  this.value = this.value.replace(/[^0-9]/g,"").slice(0,10);
+});
+
+/* ── Stars ── */
+const starLabels = ["","แย่มาก 😞","ต้องปรับปรุง 😕","พอใช้ได้ 😐","ดีมาก 😊","ยอดเยี่ยม 🤩"];
+const scores = {q1:0, q2:0};
 
 document.querySelectorAll(".star-btn").forEach(b=>{
-  b.innerHTML=`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+  b.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
 });
 
 document.querySelectorAll(".stars").forEach(row=>{
@@ -427,40 +451,21 @@ document.querySelectorAll(".stars").forEach(row=>{
 });
 
 function updateProg(){
-  const req=[scores.q1>0,scores.q2>0,!!document.getElementById("branch").value];
+  const req=[scores.q1>0, scores.q2>0, !!document.getElementById("branch").value];
   document.getElementById("progFill").style.width=(req.filter(Boolean).length/req.length*100)+"%";
 }
 
-// Submit
-let _busy=false;
-function genID(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
-
+/* ── Submit ── */
+let _busy = false;
+function genID(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function saveBackup(p){
-  try{
-    const list=JSON.parse(sessionStorage.getItem("motta_backup")||"[]");
-    list.push({...p,at:new Date().toISOString()});
-    sessionStorage.setItem("motta_backup",JSON.stringify(list));
-  }catch(_){}
+  try{const l=JSON.parse(sessionStorage.getItem("motta_backup")||"[]");l.push({...p,at:new Date().toISOString()});sessionStorage.setItem("motta_backup",JSON.stringify(l));}catch(_){}
 }
-
-async function sendToSupabase(payload,retry=3){
-  const body=JSON.stringify({
-    branch   :payload.branch,
-    staff    :payload.staff   ||null,
-    phone    :payload.phone   ||null,
-    q1       :payload.q1,
-    q2       :payload.q2,
-    total    :payload.q1+payload.q2,
-    comment  :payload.comment ||null,
-    submit_id:payload.sid
-  });
+async function sendToSupabase(payload, retry=3){
+  const body=JSON.stringify({branch:payload.branch,staff:payload.staff||null,phone:payload.phone||null,q1:payload.q1,q2:payload.q2,total:payload.q1+payload.q2,comment:payload.comment||null,submit_id:payload.sid});
   for(let i=1;i<=retry;i++){
     try{
-      const res=await fetchWithTimeout(SUPABASE_URL+"/rest/v1/responses",{
-        method:"POST",
-        headers:{...SB_HEADERS,"Prefer":"return=minimal"},
-        body
-      },8000);
+      const res=await fetchWithTimeout(SUPABASE_URL+"/rest/v1/responses",{method:"POST",headers:{...SB_HEADERS,"Prefer":"return=minimal"},body},8000);
       if(res.status===201||res.status===409)return true;
       throw new Error("HTTP "+res.status);
     }catch(e){if(i<retry)await new Promise(r=>setTimeout(r,1500*i));}
@@ -468,34 +473,23 @@ async function sendToSupabase(payload,retry=3){
   return false;
 }
 
-document.getElementById("form").addEventListener("submit",async e=>{
+document.getElementById("form").addEventListener("submit", async e=>{
   e.preventDefault();
-  if(_busy)return;
-  const branch=document.getElementById("branch").value;
-  if(!branch){alert("กรุณาเลือกสาขา");return;}
-  const _phone=document.getElementById("phone").value.trim();
-  if(!/^[0-9]{10}$/.test(_phone)){alert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก (ตัวเลขเท่านั้น)");return;}
-  if(!scores.q1||!scores.q2){alert("กรุณาให้คะแนนทั้ง 2 หัวข้อ");return;}
-
-  _busy=true;
-  const btn=document.getElementById("submitBtn");
-  btn.disabled=true;
-  btn.innerHTML=`<div class="spinner"></div> กำลังบันทึก...`;
-  document.getElementById("errBanner").style.display="none";
-
-  const payload={
-    sid    :genID(),
-    branch,
-    staff  :document.getElementById("staffName").value.trim(),
-    phone  :document.getElementById("phone").value.trim(),
-    q1     :scores.q1,
-    q2     :scores.q2,
-    comment:document.getElementById("comment").value.trim()
-  };
-
+  if(_busy) return;
+  const branch = document.getElementById("branch").value;
+  if(!branch){ alert("กรุณาเลือกสาขา"); return; }
+  const _phone = document.getElementById("phone").value.trim();
+  if(!/^[0-9]{10}$/.test(_phone)){ alert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก (ตัวเลขเท่านั้น)"); return; }
+  if(!scores.q1||!scores.q2){ alert("กรุณาให้คะแนนทั้ง 2 หัวข้อ"); return; }
+  _busy = true;
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spinner"></div> กำลังบันทึก...`;
+  document.getElementById("errBanner").style.display = "none";
+  const payload = {sid:genID(), branch, staff:document.getElementById("staffName").value.trim(), phone:document.getElementById("phone").value.trim(), q1:scores.q1, q2:scores.q2, comment:document.getElementById("comment").value.trim()};
   saveBackup(payload);
   showSuccess(payload);
-  sendToSupabase(payload).finally(()=>{_busy=false;});
+  sendToSupabase(payload).finally(()=>{ _busy=false; });
 });
 
 function showSuccess(p){
@@ -509,7 +503,8 @@ function showSuccess(p){
 
 function resetForm(){
   scores.q1=scores.q2=0;
-  document.getElementById("form").reset();
+  document.getElementById("phone").value="";
+  document.getElementById("comment").value="";
   document.querySelectorAll(".star-btn").forEach(b=>b.classList.remove("lit"));
   document.querySelectorAll(".star-label").forEach(l=>{l.textContent="";l.classList.remove("on");});
   const btn=document.getElementById("submitBtn");
@@ -519,20 +514,9 @@ function resetForm(){
   document.getElementById("form").style.display="block";
   document.getElementById("successCard").style.display="none";
   document.getElementById("progFill").style.width="0%";
-  const branchEl=document.getElementById("branch");
-  if(_urlBranch){
-    const want=decodeURIComponent(_urlBranch);
-    [...branchEl.options].forEach(o=>{if(o.text.includes(want))branchEl.value=o.value;});
-    branchEl.disabled=true;
-  }
-  fillStaff(branchEl.value);
-  if(_urlStaff){
-    const staffEl=document.getElementById("staffName");
-    const name=decodeURIComponent(_urlStaff);
-    if(![...staffEl.options].some(o=>{if(o.text===name){staffEl.value=o.value;return true;}}))
-      staffEl.add(new Option(name,name,true,true));
-    staffEl.disabled=true;
-  }
+  // re-apply url params
+  if(_urlBranch){ setBranch(decodeURIComponent(_urlBranch), true); } else { setBranch("", false); }
+  if(_urlStaff){  setStaff(decodeURIComponent(_urlStaff), true);  } else { setStaff("", false); }
   window.scrollTo({top:0,behavior:"smooth"});
 }
 </script>
