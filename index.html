@@ -119,6 +119,20 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
 
+<!-- DEBUG PANEL — ลบออกหลังแก้ปัญหาเสร็จ -->
+<div id="dbg" style="background:#1a1a2e;color:#00ff88;font-family:monospace;font-size:11px;padding:10px 14px;max-height:160px;overflow-y:auto;line-height:1.7;white-space:pre-wrap;word-break:break-all;"></div>
+<script>
+function log(msg){
+  const d=document.getElementById("dbg");
+  if(!d)return;
+  d.textContent+="["+new Date().toISOString().slice(11,19)+"] "+msg+"\n";
+  d.scrollTop=d.scrollHeight;
+}
+window.onerror=function(m,s,l){log("❌ JS ERROR: "+m+" ("+s+":"+l+")");};
+window.onunhandledrejection=function(e){log("❌ PROMISE: "+(e.reason?.message||e.reason));};
+log("📱 UA: "+navigator.userAgent.slice(0,80));
+</script>
+
 <div class="wrap">
 <form id="form">
 
@@ -296,26 +310,39 @@ function fetchWithTimeout(url, options, ms){
 }
 
 async function loadStaff(){
+  log("🔄 loadStaff start");
   try{
     const raw=sessionStorage.getItem(CACHE_KEY);
-    if(raw){const c=JSON.parse(raw);if(Date.now()-c.t<CACHE_MIN*60000){staffMap=c.d;return;}}
-  }catch(_){}
+    if(raw){
+      const c=JSON.parse(raw);
+      if(Date.now()-c.t<CACHE_MIN*60000){
+        staffMap=c.d;
+        log("✅ cache hit, branches: "+Object.keys(staffMap).length);
+        return;
+      }
+    }
+  }catch(e){log("⚠️ cache read err: "+e.message);}
   try{
+    log("📡 fetching Supabase...");
     const res=await fetchWithTimeout(
       SUPABASE_URL+"/rest/v1/staff?select=branch,name&active=eq.true&order=branch,name",
       {headers:SB_HEADERS},
       8000
     );
-    if(!res.ok)return;
+    log("📥 status: "+res.status);
+    if(!res.ok){log("❌ not ok: "+res.status);return;}
     const rows=await res.json();
+    log("📦 rows: "+rows.length);
     const map={};
     rows.forEach(r=>{if(!r.branch||!r.name)return;if(!map[r.branch])map[r.branch]=[];map[r.branch].push(r.name);});
     staffMap=map;
+    log("✅ branches loaded: "+Object.keys(map).length);
     sessionStorage.setItem(CACHE_KEY,JSON.stringify({t:Date.now(),d:map}));
-  }catch(_){}
+  }catch(e){log("❌ fetch error: "+e.message);}
 }
 
 function fillStaff(branch){
+  log("👥 fillStaff branch='"+branch+"' names="+(staffMap[branch]||[]).length);
   const sel=document.getElementById("staffName");
   const names=branch?(staffMap[branch]||[]):[];
   sel.innerHTML="";
@@ -348,10 +375,13 @@ function applyUrlParams(){
 
 // แสดง loading ระหว่างโหลดรายชื่อ แล้วค่อย applyUrlParams — ป้องกัน race condition
 (async()=>{
+  log("🚀 init start");
   const staffSel=document.getElementById("staffName");
   staffSel.innerHTML="<option value=''>กำลังโหลดข้อมูล...</option>";
   await loadStaff();
+  log("✅ loadStaff done, calling applyUrlParams");
   applyUrlParams();
+  log("✅ applyUrlParams done");
 })();
 
 // กรองเฉพาะตัวเลข + จำกัด 10 หลัก
